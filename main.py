@@ -9,3 +9,5 @@ async def cat_info(cat):
         return "барсик серый"
     elif cat=="вася":
         return "вася прозрачный"
+    else:
+        return None
