@@ -11,3 +11,9 @@ async def cat_info(cat):
         return "вася прозрачный"
     else:
         return None
+@server.get("/dogs/{god}")
+async def dog_info(god):
+    if god=="ержан":
+        return ":D"
+    else:
+        return "здеся таких нет"
