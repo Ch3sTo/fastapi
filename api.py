@@ -1,19 +1,12 @@
 from fastapi import FastAPI
+
+players={}
 server=FastAPI()
-@server.get("/")
-async def return_massage():
-    return {"message": "helloooo"}
-@server.get("/cats/{cat}")
-async def cat_info(cat):
-    if cat=="барсик":
-        return "барсик серый"
-    elif cat=="вася":
-        return "вася прозрачный"
-    else:
-        return None
-@server.get("/dogs/{god}")
-async def dog_info(god):
-    if god=="ержан":
-        return ":D"
-    else:
-        return "здеся таких нет"
+@server.get("/player/connect")
+async def history(name:str, color:str, position:tuple):
+    players.update({name:{"color":color, "position":position}})
+@server.get("/player/live")
+async def history1(name:str, color:str, position_x:int, position_y:int):
+    players.update({name:{"color":color, "position":(position_x, position_y)}})
+    return players
+
