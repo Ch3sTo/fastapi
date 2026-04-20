@@ -3,14 +3,25 @@ import requests
 from dataclasses import dataclass
 
 class Player:
-    def __init__(self, x, y, w, h, color):
+    def __init__(self, x, y, w, h, color, name):
+        self.name=name
         self.body=pygame.Rect(x, y, w, h)
+
         self.color=color
+        self.nameplate=self.create_nameplate()
         #self.pos=list(self.body.center)
     def show(self):
         pygame.draw.rect(pg, self.color, self.body)
+        pg.blit(self.nameplate, (self.body.x, self.body.y-20))
+    def create_nameplate(self):
+        font=pygame.font.Font(None, 20)
+        name_plate=font.render(self.name, True, "white")
+        return name_plate
 name=input()
 color=input()
+session=requests.Session()
+adapter=requests.adapters.HTTPAdapter()
+session.mount("http://", adapter)
 pygame.init()
 pg=pygame.display.set_mode((600, 600))
 fps=pygame.time.Clock()
@@ -19,23 +30,23 @@ players_param={}
 
 while True:
     if name not in players:
-        live=requests.get(f"http://127.0.0.1:8000/player/live/?name={name}&color={color}&position_x=300&position_y=300")
+        live=session.get(f"http://127.0.0.1:8000/player/live/?name={name}&color={color}&position_x=300&position_y=300")
         players_param.update(live.json())
         print(players_param)
         for player_name in players_param:
 
-            players.update({player_name:Player(players_param[player_name]["position"][0], players_param[player_name]["position"][1], 50, 50, players_param[player_name]["color"])})
+            players.update({player_name:Player(players_param[player_name]["position"][0], players_param[player_name]["position"][1], 50, 50, players_param[player_name]["color"], player_name)})
 
 
 
 
 
     else:
-        live = requests.get(f"http://127.0.0.1:8000/player/live/?name={name}&color={color}&position_x={players[name].body.x}&position_y={players[name].body.y}")
+        live = session.get(f"http://127.0.0.1:8000/player/live/?name={name}&color={color}&position_x={players[name].body.x}&position_y={players[name].body.y}")
         players_param.update(live.json())
         for player_name in players_param:
             if player_name not in players:
-                players.update({player_name:Player(players_param[player_name]["position"][0], players_param[player_name]["position"][1], 50, 50, players_param[player_name]["color"])})
+                players.update({player_name:Player(players_param[player_name]["position"][0], players_param[player_name]["position"][1], 50, 50, players_param[player_name]["color"], player_name)})
             players[player_name].body.x=players_param[player_name]["position"][0]
             players[player_name].body.y=players_param[player_name]["position"][1]
     for x in pygame.event.get():
